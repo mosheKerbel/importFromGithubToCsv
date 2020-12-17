@@ -1,0 +1,625 @@
+summary,description,labels,component,issueType,reporter
+Light Dark skin for Icon button,"<img width=""764"" alt=""Screenshot 2020-12-17 at 11 55 43"" src=""https://user-images.githubusercontent.com/5814585/102472251-ccae2380-405e-11eb-81c6-c7b4b4d0d42f.png"">
+",dev,base-ui,Task,moshek
+wix base ui types are returning to their home,"Ages ago we generated wix base ui types with `dts-gen` for `editor-elements`. (Or it was stolen from the [responsive-editor](https://github.com/wix-private/responsive-editor-packages/blob/master/types/wix-base-ui/index.d.ts#L67), nobody knows)
+
+https://github.com/wix-private/editor-elements/blob/master/packages/editor-elements-library/src/externals/wix-base-ui.d.ts
+
+We are thinking, now it is the time to return types to their sweet home.😄",dev,base-ui,Task,moshek
+Manage versions and releases to support a deprecation process,"We are lately running into issues where a deprecation process like WSR could help us solve it in a better way.
+We need to consider creating a changelog and manage versions and releases.","dev,Infra",base-ui,Task,moshek
+Improve tooltip mechanism,"There are 5 open issues on problems with the tooltip - https://github.com/wix-private/wix-base-ui/issues?q=is%3Aopen+is%3Aissue+label%3ATooltip
+We need to consider refactoring the mechanism, rewrite it with popper, or any other solution which can solve us the 5 issues all together.","dev,Infra,Tooltip",base-ui,Task,moshek
+Add missing drivers for components in the library,This issue will be updated with a prioritized list of components.,"dev,Infra",base-ui,Task,moshek
+Add visual tests for all the components in the library,This issue will be updated with a prioritized list of components.,"dev,Infra",base-ui,Task,moshek
+Create Icons Bank,"Create an icons bank for the library
+1. Users will be able to import a set of icons from the library
+2. Add a storybook search mechanism to explore the icons bank (similar to wsr)
+ 
+* Effort already started in UX side and reflected in Monday
+I put it here because I feel it is part of our Technical Backlog and it is convenient to manage it from here.","dev,Docs,Icons",base-ui,Task,moshek
+Add instructions on how to use colorPicker comopnents,"Currently, there are controls and composites in the library to work with the whole color picker variations.
+There are also a few examples in the storybook.
+In practice, these examples do not work. Users are currently opening the color pickers through the editor-platform sdk which uses internal editor implementation.
+1. We need to explain it well in our docs
+2. We need to move the storybook examples under WIP, because it's currently not working well.
+3. We need to look at the impl. inside the editor-platform and realize whether it should be changed to use the components from base-ui.","dev,Docs",base-ui,Task,moshek
+onChange callback is being called after value prop for Slider is changed,"Currently, there is an issue with Slider component.
+When the value is being changed outside and updated props come, the onChange callback is being called.
+
+After some debugging we've figured out that the reason is `NumericInput` being used inside:
+https://github.com/wix-private/wix-base-ui/blob/master/src/controls/slider/slider.js#L208
+
+Inside `NumericInput`, there is a prop check that finally calls onChange if the value doesn't being changed:
+https://github.com/wix-private/wix-base-ui/blob/master/src/controls/numericInput/numericInput.js#L160
+Calling `onChange` in this case doesn't have any sense, since it's calling additional setState on user's side and causing bugs.
+
+```ts
+const MyComp = () => {
+const [value, setValue] = useState(0);
+
+const handleChange = useCallback((newValue) => {
+  setValue(newValue);
+}, []);
+
+
+return <Slider
+  value={value}
+  onChange={handleChange} // will be called twice
+/>
+};
+```
+
+Other component based on Slider also affected:
+```ts
+
+<OpacityPicker
+  value={this.props.value} // in case, the value is changed outside of the component (for example after UNDO action), the this.handleOpacityChange will be called
+  onChange={this.handleOpacityChange}
+  opacityGradientColor={withoutOpacity(value.value)}
+  automationId=""opacity-picker""
+/>
+```
+
+
+","dev,Bug,Slider",base-ui,Task,moshek
+Create e2e infra with Puppeteer,"Currently we do not have something the users can test interactive visual stuff, like for example - css hover states.","dev,Infra",base-ui,Task,moshek
+<Tab/> - documentation is missing (Part of VerticalTabs),"![image](https://user-images.githubusercontent.com/6093192/97407742-c96ea500-1903-11eb-81c2-a57c5e35967b.png)
+
+While `VerticalTabs` original API knows how to get `options`, it can get also child components of `Tab` and also add the dot indicator. maybe there are also other features.
+
+Anyway, both the `Tab` and the composition should be documented","dev,Docs",base-ui,Task,moshek
+<Composites.BannerPremium/> - missing documentation page,"Actually, it should be a component and not a composite, but at least let's document it first","dev,Docs",base-ui,Task,moshek
+< RadioButtonsWithIllustration/> - missing documentation page,,"dev,Docs",base-ui,Task,moshek
+Make it clear per-component if it has a responsive skin only or classic skin only,"Following Zohar's request, we need to make a good distinction per component skin.
+
+We have this overlay that says some components are only for responsive which is nice:
+![image](https://user-images.githubusercontent.com/6093192/93900779-77cc6c80-fcfe-11ea-9b48-9f3209d22599.png)
+
+It could also be nice in the case when the ""Responsive Skin"" toggle is one - to show a similar also for the ""classic-only"" skin","dev,Infra",base-ui,Task,moshek
+<Slider/> - organize features and map the gaps to the specs,"This feature for example exists but not documented, obviously need to map the gaps between the requirements (some features are missing in the specs)
+```jsx
+() => {
+  const [value, setValue] = React.useState(42);
+
+  return (
+    <Slider
+      hideNumericInput
+      value={value}
+      onChange={setValue}
+      customFillGradient={`linear-gradient(to right, ${'red'}, ${'green'})`}
+    />
+  );
+};
+```","dev,Docs,enhancement",base-ui,Task,moshek
+<InfoIcon/> - missing docs page,,"dev,Docs",base-ui,Task,moshek
+"<ContextMenu /> doesn't re-render when adding Actions after first render, causing broken UI","1. Open a ContextMenu
+2. Close it
+3. Programatically add a ContextMenuAction with a long label (children of ContextMenu)
+4. Open the ContextMenu again
+Actual Behavior - The UI looks broken. See [CRVD-2701](https://jira.wixpress.com/browse/CRVD-2701)
+
+I put in a fix in our repo, by adding the length of the children to the `key` of ContextMenu forcing it to re-render. see https://github.com/wix-private/wix-code-devex/pull/343","dev,Bug,ContextMenu",base-ui,Task,moshek
+<Dropdown/> - cleanup the different dropdown options,"lately, a multi-select feature was added to the dropdown, and boy oh boy the mess...
+there are quite a few list items, each is visually different (with illustration, with description, ...)
+
+For the case of multi-select, but not only, a somewhat generic `<DropDownListItemOption/>` was created.
+It supports the different UI requirements https://zpl.io/2p90X6Q.
+
+however, it's still quite ugly to use since in order to use some variation, you should apply another class for the dropdown container - `larger-item-list-dropdown-options`
+```jsx
+      <DropDown
+        placeholder=""With RoundedIllustrationContainer and disabled""
+        optionsContainerClassName=""larger-item-list-dropdown-options""
+        value={ddValue}
+        onChange={setDdValue}
+      >
+        <DropDownListItemOption
+          value=""1""
+          label=""holder with icon 1""
+          prefix={
+            <RoundedIllustrationContainer>
+              <SettingsIcon />
+            </RoundedIllustrationContainer>
+          }
+        />
+        <DropDownListItemOption
+          value=""2""
+          disabled
+          label=""Disabled""
+          prefix={
+            <RoundedIllustrationContainer>
+              <SettingsIcon />
+            </RoundedIllustrationContainer>
+          }
+        />
+      </DropDown>
+```
+
+The goal is to make sure that `DropDownListItemOption` is the only thing used and avoid adding the `larger-item-list-dropdown-options` classname.
+
+It requires some investigation but that's the way to go","dev,enhancement",base-ui,Task,moshek
+<ColorPickerPaletteDialog/> - missing documentation page,,"dev,Docs",base-ui,Task,moshek
+<ColorPickerInput/> - missing component documentation,,"dev,Docs",base-ui,Task,moshek
+<RichText/> - component documentation is missing,,"dev,Docs",base-ui,Task,moshek
+<Dropdown/> - improve documentation,"Currently, the docs are quite complicated to understand how to use the component.
+Both functionality-wise and design-wise.
+
+Some examples:
+1. List items should be separately documented
+2. How to use the ""search"" capabilities""
+3. How to use the multi-select (still in development)
+
+@AdirAmsalem @matveyok - I'll be happy to hear more of your use cases which are complicated to understand from the docs
+","dev,Docs",base-ui,Task,moshek
+"Create a ""cheatsheet"" mapping for controls, composites and components","Help developers to map between Zeplin specs and code
+Also will help us, the maintainers, to understand what is developed and what should be fixed in the specs","dev,Docs",base-ui,Task,moshek
+"Create a better ""Getting started"" guide to the library","""Create your first panel"" - a simple step-by-step explaining how to create a panel.
+describe what are **controls** and **composites** and when to use them","dev,Docs",base-ui,Task,moshek
+<TooltipOnEllipsis/> - missing documentation,"interesting component, need to see who use it","dev,Docs",base-ui,Task,moshek
+Add playground with saved snippets,Same as wix-style-react's playground,"dev,Infra",base-ui,Task,moshek
+Tooltip Component - onOpen Callback called twice when using openDelay,"We are using onOpen callback to send BI events. 
+When adding a prop of openDelay, the onOpen callback is called twice.","dev,Bug,Tooltip",base-ui,Task,moshek
+Missing documentation for validation error tooltip that has a description with a link,"The feature is implemented as can be seen [here](https://drive.google.com/file/d/1SpMBkkGtypZG2UYz34LATaQQ77ZvzpXh/view?usp=sharing), but isn't documented.","dev,Docs",base-ui,Task,moshek
+TextLabel - ellipsis tooltip causes modal layout to break,"Take this example:
+![image](https://user-images.githubusercontent.com/6093192/86336349-6bcd9300-bc58-11ea-86da-0a94044bf890.png)
+
+```jsx
+<Composites.PopupSmallSize className=""danger"">
+  <PanelHeader>
+    <span>Pop Up small size - 01A - danger</span>
+  </PanelHeader>
+  <Composites.PanelContent>
+    <Composites.RichTextWithIllustration>
+      <Illustration>{this.deleteElem}</Illustration>
+      <Composites.RichTextLabeled>
+        <TextLabel value=""This is a deletion label This is a deletion label This is a deletion label. This is a deletion label This is a deletion label This is a deletion label This is a deletion label v v v. This is a deletion label This is a deletion label "" />
+        <RichText>
+          When you delete the <a>Thing</a> - bad things might happen. When you delete the <a>Thing</a> - bad things might happen. When you delete the <a>Thing</a> - bad things might happen. When you delete the <a>Thing</a> - bad things might happen. When you delete the <a>Thing</a> - bad things might happen. When you delete the <a>Thing</a> - bad things might happen. When you delete the <a>Thing</a> - bad things might happen. When you delete the <a>Thing</a> - bad things might happen. When you delete the <a>Thing</a> - bad things might happen. When you delete the <a>Thing</a> - bad things might happen. When you delete the <a>Thing</a> - bad things might happen. When you delete the <a>Thing</a> - bad things might happen. v
+        </RichText>
+      </Composites.RichTextLabeled>
+    </Composites.RichTextWithIllustration>
+  </Composites.PanelContent>
+  <Composites.ActionSetHorizontal>
+    <Button className=""secondary"">Cancel</Button>
+    <Button className=""primary"">Delete</Button>
+  </Composites.ActionSetHorizontal>
+</Composites.PopupSmallSize>
+```
+
+as you can see, once the general TextLabel is very long, it just breaks the layout instead of getting ellipsis.
+
+A possible solution is to force it to break a line by applying `<TextLabel enableEllipsis={false}/>`. It's a workaround and not the actually required behavior.
+
+We should probably try to understand why the ellipsis doesn't work
+","dev,Bug,Popups",base-ui,Task,moshek
+Popups - missing examples in the docs,"The storybook guide page is great and explains what each part does, but we're missing some examples for good compositions. For example, the danger modal
+
+```jsx
+<Composites.PopupSmallSize className=""danger"">
+  <PanelHeader>
+    <span>Pop Up small size - 01A - danger</span>
+  </PanelHeader>
+  <Composites.PanelContent>
+    <Composites.RichTextWithIllustration>
+      <Illustration>{this.deleteElem}</Illustration>
+      <Composites.RichTextLabeled>
+        <TextLabel value=""This is a deletion label"" />
+        <RichText>
+          When you delete the <a>Thing</a> - bad things might happen.
+        </RichText>
+      </Composites.RichTextLabeled>
+    </Composites.RichTextWithIllustration>
+  </Composites.PanelContent>
+  <Composites.ActionSetHorizontal>
+    <Button className=""secondary"">Cancel</Button>
+    <Button className=""primary"">Delete</Button>
+  </Composites.ActionSetHorizontal>
+</Composites.PopupSmallSize>
+```","dev,Docs,Popups",base-ui,Task,moshek
+Popups - missing background color,"Taking this example, a white background color is missing
+```jsx
+<Composites.PopupSmallSize className=""danger"">
+  <PanelHeader>
+    <span>Pop Up small size - 01A - danger</span>
+  </PanelHeader>
+  <Composites.PanelContent>
+    <Composites.RichTextWithIllustration>
+      <Illustration>{this.deleteElem}</Illustration>
+      <Composites.RichTextLabeled>
+        <TextLabel value=""This is a deletion label"" />
+        <RichText>
+          When you delete the <a>Thing</a> - bad things might happen.
+        </RichText>
+      </Composites.RichTextLabeled>
+    </Composites.RichTextWithIllustration>
+  </Composites.PanelContent>
+  <Composites.ActionSetHorizontal>
+    <Button className=""secondary"">Cancel</Button>
+    <Button className=""primary"">Delete</Button>
+  </Composites.ActionSetHorizontal>
+</Composites.PopupSmallSize>
+```","dev,Infra",base-ui,Task,moshek
+SortByDragListItemRow -> contextMenu stop event propagation,"Right now this is no way to stop event propagation when clicking by `ContextMenu` in `SortByDragListItemRow` component.
+Because `ContextMenu` is a child of `SortByDragListItemRow`, clicking on `ContextMenu` triggers `select` prop from `SortByDragListItemRow`, but it's not always needed.
+
+
+https://github.com/wix-private/wix-base-ui/blob/d61fad1023d385dc17ad3bd9930e7c655fbb6e7e/src/controls/sortByDragList/itemRow.jsx.js#L32
+https://github.com/wix-private/wix-base-ui/blob/d61fad1023d385dc17ad3bd9930e7c655fbb6e7e/src/controls/sortByDragList/itemRow.jsx.js#L106
+
+I could contribute it, if needed, but I don't see any clear decision right now","dev,Bug,SortByDragList",base-ui,Task,moshek
+<TextInputMultiline/> onBlur prevent other events.,"For `<TextInputMultiline/>` if it is focused, clicking out of it causing it to blur like expected but the event that should happen is somehow prevented.
+For example - if you have a button aside and you click on it, then the click handler of the button is not doing anything
+
+Reproduction:
+```jsx
+<>
+<TextInputMultiline/>
+<Button onClick={()=>alert('hello')}>click here</Button>
+</>
+```","dev,Bug,TextInputMultiline",base-ui,Task,moshek
+Untranspiled code from `react-custom-scroll` dependency ,"Currently, in the bundle of `base-ui` there is `const` keyword that came from `react-custom-scroll` dependency: [link to source](https://github.com/wix-private/wix-base-ui/blob/48da00d3ea6d11eecde1542a1d7bfdfdb3efd635/src/index.js#L40)
+
+![image](https://user-images.githubusercontent.com/5034399/79337351-035ef780-7f2e-11ea-962f-568c2d75e571.png)
+
+As a result, it can hurt Wix User experience working with Settings Panel in older browsers which doesn't support ES2015.
+
+","dev,Bug,Infra",base-ui,Task,moshek
+<Tooltip /> component issues with openDelay - tooltip stuck,"**Issue:**
+The tooltip is stuck even when the 
+mouse is moving out of hover area
+
+![Screen Shot 2020-04-06 at 16 32 49](https://user-images.githubusercontent.com/23697153/78564078-9ad49400-7824-11ea-9b9d-17359d9dc10c.png)
+
+
+**how to replicate:**
+use tooltip with openDelay which is long enough for you to:
+ hover => click => move out of button area before the tooltip appears
+
+**example of replication (use in the playground):** 
+
+Note: in the playground, it is even weirder, as the tooltip first appears in the bottom corner of the screen.
+
+![Screen Shot 2020-04-06 at 16 33 00](https://user-images.githubusercontent.com/23697153/78564109-a45dfc00-7824-11ea-8553-f091078d5703.png)
+
+```
+() => {
+  const values = ['Button 1','Button 2'];
+  const [selectedValue, setValue] = React.useState(values[0]);
+  return (
+      <Composites.ButtonsGroup>
+        <ButtonsGroup value={selectedValue} onChange={(value) => setValue(value)}>
+          {values.map(value =>
+            <Tooltip
+              className=""radio-button-label""
+              content={'Content Tooltip'}
+              key={value} value={value}
+              openDelay={1000}
+            > 
+              <div>{value}</div>
+            </Tooltip>
+          )}
+        </ButtonsGroup>
+      </Composites.ButtonsGroup>
+  );
+};
+```","dev,Bug,Tooltip",base-ui,Task,moshek
+Ensure list of components have properly exported unidrivers,"These components should have unidrivers ready for consumption:
+
+* [x] TextLabel https://github.com/wix-private/wix-base-ui/pull/513
+* [x] TextInput https://github.com/wix-private/wix-base-ui/pull/515
+* [x] TextInputMultiline https://github.com/wix-private/wix-base-ui/pull/516
+* [ ] ContextMenu
+* [ ] ContextMenuAction
+* [ ] PanelHeader
+* [ ] ToggleSwitch
+
+It is a priority for Promote team advanced SEO client project","dev,Infra,Tests",base-ui,Task,moshek
+i18n provider for translations,"## General 
+
+Currently BaseUI components use `translateFromContext` functionality as seen in [withTranslation](https://github.com/wix-private/wix-base-ui/blob/0ed2d1586985549e637026b0bc209635aaaf8a72/src/hoc/withTranslation.js#L21)
+This should be replaced with modern React approach of Context.Provider & Context.Consumer
+
+## Motivation 
+
+- Remove deprecated React approach (using context directly) forcing BaseUI consumers to use getChildContext()
+- Expose Provider that can receive i18n instance to allow translations to be injected by consumers in a modern way.
+
+## Migration
+
+- Fallback to `translateFromContext` until all consumers use Provider exported from BaseUI. ","dev,Infra",base-ui,Task,moshek
+Broken layout of Thumbnails in Mac Firefox. ,"I have usage of lib as follows:
+```js
+const shapeOptions = [
+      {
+        value: ImageShape.Square,
+        illustration: <ShapeSquare />,
+        label: t('settings.tab.layout.square'),
+      },
+      {
+        value: ImageShape.Round,
+        illustration: <ShapeRound />,
+        label: t('settings.tab.layout.round'),
+      },
+      {
+        value: ImageShape.Rectangle,
+        illustration: <ShapeRectangle />,
+        label: t('settings.tab.layout.rectangle'),
+      },
+    ];
+
+<Composites.Thumbnails>
+                    <TextLabel value={t('settings.tab.layout.shape')} />
+                    <Thumbnails
+                      shouldAddTooltipOnEllipsis={false}
+                      maxThumbsPerRow={4}
+                      value={settings.get(challengeSettings.imageShape)}
+                      onChange={(value: ImageShape) => {
+                        settings.set(challengeSettings.imageShape, value);
+
+                        BIOwnerLogger.changeSettings({
+                          settingsType: ScreenName.ChallengesList,
+                          category: 'Layout',
+                          subcategory: challengeSettings.imageShape.key,
+                          value,
+                        });
+                      }}
+                      options={shapeOptions}
+                    />
+                  </Composites.Thumbnails>
+```
+
+**Actual result in Firefox:**
+![image](https://user-images.githubusercontent.com/5034399/77063798-fdd1c880-69e6-11ea-9f70-d9ab7afd839e.png)
+
+
+**##Actual result in Chrome:**
+![image](https://user-images.githubusercontent.com/5034399/77063831-0e823e80-69e7-11ea-8f05-b3ea92a3743e.png)
+
+","dev,Bug,Thumbnails",base-ui,Task,moshek
+Dropdown list performs no prefix matching,"Example: dropdown options are ['Israel', 'Lithuania', 'Ruanda', 'Uganda', 'UK', 'Ukraine'].
+
+1. User types 'u' - the item for 'Uganda' should receive focus.
+2. User types 'k' (shortly after the 'u') - focus moves to 'UK'.
+3.
+    A. User types 'r' (shortly after the 'k') - focus moves to 'Ukraine'.
+    B. User types 'r' but after a while from the 'k' - focus moves to 'Ruanda'.
+
+When an item is under focus pressing Space or Enter should select it (same as if it received focus via the Up/Down arrow keys).
+
+We need to decide on the debounce rate (delta between keystrokes before prefix is reset).","dev,Dropdown,enhancement",base-ui,Task,moshek
+<DatePicker /> – `startDay` and `days` crashes component,"```
+<DatePicker days={['1', '2', '3', '4', '5', '6', '7']} />
+```
+Crashes the component as `startDay` is not found. It shouldn't crash the component I suppose. Also this crashes storybook when chaning props.
+Vice versa is the same – if I pass a non-existent `startDay` the component hungs up.","dev,Bug,DatePicker",base-ui,Task,moshek
+Either add Divider to pre-built bundle or allow importing individual component styles,"After trying to import individual styles for components that we use we discovered that bundle size increased significantly. Then as a temporary measure we imported a pre-bundled CSS. However, this CSS does not include <Divider /> styles and they need to be imported separately anyway.
+
+Expected result:
+1) Ideally it should be possible to include only used styles without increasing bundle size a lot due to style duplication.
+2) As a temporary fix it would be nice to have Divider as part of pre-bundled CSS.","dev,Divider,enhancement",base-ui,Task,moshek
+Typescript support,"## The issue - 
+
+ - Currently when using BaseUI with typescript you get an error for missing definitions - 
+
+![image](https://user-images.githubusercontent.com/24541325/74643845-0e8be600-517e-11ea-9b02-f69243342eb7.png)
+
+- This forces consumers to maintain [separate `wix-base-ui.d.ts` file](https://github.com/wix-private/responsive-editor-packages/blob/9edeb46d9becb85a9859c4f63ab4f2107bc1216f/types/wix-base-ui.d.ts#L85) 
+
+## Can be resolved by - 
+
+- Types should be managed by lib - move `wix-base-ui.d.ts` maintenance to lib responsibility. ","dev,Infra,enhancement",base-ui,Task,moshek
+TextInput - API parsing fails,"Autodocs fails to parse `TextInput` comopnent
+https://wix-private-wix-base-ui.surge.sh/?activeTab=API&path=%2Fstory%2Fcontrols--textinput
+![image](https://user-images.githubusercontent.com/7388217/73923891-42405380-48d4-11ea-87ea-ff861267b962.png)
+
+@argshook 
+","dev,Docs,Infra",base-ui,Task,moshek
+Fix panel header light - text color,"Text color is black, it should use editor global colors - D1
+![image](https://user-images.githubusercontent.com/46131591/72789777-fdae8a00-3c3c-11ea-89eb-6506ba868d0c.png)
+","dev,Bug,PanelHeader",base-ui,Task,moshek
+Fix radio button icon,"Inner circle (for selected radio button) should be smaller, and sit nicer in the outline circle;
+Outer = 16px
+Inner = 10px
+
+![image](https://user-images.githubusercontent.com/46131591/72789280-25512280-3c3c-11ea-8664-c7ffcaeed107.png)
+
+","dev,Bug,RadioButton",base-ui,Task,moshek
+"Fix ""Button with icon"" composite height","I think because this is a variant for ""Action with symbol"" it was developed using the same height and not according to the specs.
+
+Composite should be 54px hight,
+It’s currently 83px high
+
+![image](https://user-images.githubusercontent.com/46131591/72788008-af4bbc00-3c39-11ea-81d6-42271a7ebdaa.png)
+
+Should look like this:
+![image](https://user-images.githubusercontent.com/46131591/72788077-d1453e80-3c39-11ea-9a16-2907e73ed797.png)
+
+Zeplin specs:
+https://zpl.io/awJejw1 (Will update)","dev,Bug,ButtonWithIcon",base-ui,Task,moshek
+"Fix ""Action with symbol"" composite paddings","https://jira.wixpress.com/browse/WEED-14941
+
+Wrong spacing in C03 action with symbol:
+
+![image](https://user-images.githubusercontent.com/46131591/72787613-ef5e6f00-3c38-11ea-8728-4bcff405c159.png)
+
+Text and label are to close
+Overall composite height is too short (needs to be 84px)
+
+Should look like this:
+![image](https://user-images.githubusercontent.com/46131591/72787627-f4bbb980-3c38-11ea-843b-2443355c3e9e.png)
+
+
+Zeplin specs:
+https://zpl.io/bJvA75E","dev,ActionWithSymbol,Bug",base-ui,Task,moshek
+[Infra] - Add existing components to storybook,"Components are list [here](https://docs.google.com/spreadsheets/d/1swdEQ3uAc1Ntk5iycdOMUcrH6HMeqGTK7WZ1mN6pND0/edit#gid=0&fvid=506176532)
+Should add first the ones marked as **highly used**
+","dev,Infra",base-ui,Task,moshek
+[Infra] - support es6 modules,"1. support import and export of es6 modules
+2. replace the existing `require` statements of CommonJS with es6 imports.","dev,Infra,enhancement",base-ui,Task,moshek
+<Tooltip/> ,"There are issues with the props component:
+
+
+1.**direction** - didnt see any usage
+2 .**openOnMouseEnter** - if false, tooltip will not bee shown. we have also ""disabled"" for that
+
+","dev,Bug,Tooltip,enhancement",base-ui,Task,moshek
+<HorizontalTabs/> Issues in component,"There are issues with the props component:
+
+1. **arrowed box :**  
+ This variation looks broken. The index numbers are rendered as labels inside the tabs, instead of below them (Add Zeplin)","dev,Bug,HorizontalTabs,enhancement",base-ui,Task,moshek
+<ToggleSwitch/> Issues in component ,"There are issues with the props component:
+
+some props like ""labelType"", are generating class names which are computed only in the component constructor, causing that prop change does not apply. consider moving it to render function or in componentWillReceiveProps","dev,Bug,ToggleSwitch",base-ui,Task,moshek
+<TextInput/> Issues in component,"There are issues with the props component:
+1. **preventBlur** doesn't make sense - the function not working as expected
+2. **dir (default  ltr)** when changing the dir to rtl nothing happens
+
+ ","dev,Bug,TextInput",base-ui,Task,moshek
+<AngleInput/> - rotating the angle doesn't work when scrolling the page,"It works when the page is rendered, but once starting to scroll, the angle input preserves the previous location and the handle doesn't spin correctly.
+
+![image](https://user-images.githubusercontent.com/6093192/71479238-28532180-27fc-11ea-9769-44a6cc447b74.png)
+
+https://wix-private-wix-base-ui.surge.sh/?path=/story/controls--angleinput","dev,AngleInput,Bug",base-ui,Task,moshek
+Tooltip Component - toolTipPortal using old React Api,"Blocker for using connected components in Responsive.
+
+**Case:** Tooltip content throws errors when rendering connected (redux) components.
+**Root Cause:** toolTipPortal using old React API.
+
+https://github.com/wix-private/wix-base-ui/blob/master/src/controls/tooltip.js#L178
+https://github.com/wix-private/wix-base-ui/blob/master/src/controls/tooltip.js#L292
+
+**Solution:**
+Should be replaced ti the newer react API react.createPortal()
+
+Implemented here: https://github.com/wix-private/wix-base-ui/blob/master/src/controls/portal.js
+And used here: https://github.com/wix-private/wix-base-ui/blob/master/src/controls/dropDownBase.rt#L10","dev,Bug,Tooltip,enhancement",base-ui,Task,moshek
+<ContextMenu/> - Pointer is not in the middle of the icon,"Context menu pointer should be positioned - do the middle height of the icon, with a distance of 4px between the icon & the triangle
+![image](https://user-images.githubusercontent.com/7388217/70234793-1a186500-176a-11ea-8e10-1d8e5f3ba0f0.png)","dev,Bug,ContextMenu",base-ui,Task,moshek
+<InputWithDropdown/> - hidden dropdown arrow on focus,"- [ ] InputWithDropdown - when input is in focus and mouse exits the focus area the dropdown arrow is hidden.
+it should stay while in focus regardless if mouse in in hover or not. 
+![a2019-12-03](https://user-images.githubusercontent.com/7388217/70233962-4632e680-1768-11ea-8de5-acd23ac6c9ea.gif)
+
+@Zohar-Telor ","dev,Bug,InputWithDropdown",base-ui,Task,moshek
+General list of issues & current state of library,"`wix-base-ui` is a library that eventually should be fully owned by UI infra team
+
+This issue is first collection of bugs and concerns from UI infra members and also current library users.
+
+This issue eventually will be split into many others, this is first iteration
+A lot of items here are ""citation needed"" type of sentences.
+
+**Raw list:**
+1. [ ] not enough components
+1. [ ] every component import must also import a style (every single time, one user was very sad about it)
+1. [ ] many components are missing `disabled` and or `focus` and similar states
+1. [ ] a lot of real components don't exist in design files
+1. [ ] custom webpack configs sometimes required for users
+1. [ ] some users totally ignore composites prop warnings
+1. [ ] components are imported from direct path `lib/controls...`
+    1. [ ] but styles are imported from `src/`
+    1. [ ] path locations are different
+1. [ ] all the hocs make it hard to debug components for users (and contributors)
+    1. [ ] ideally, consumer should not debug `wix-base-ui` at all, but they do now sometimes
+
+
+**We have a separated open issue for it:**
+
+1. [ ] some users don't use (or even know) about translation mechanism - https://github.com/wix-private/wix-base-ui/issues/500
+1. [ ] library is not tested enough - https://github.com/wix-private/wix-base-ui/issues/759 
+1. [ ] lack of testkits - https://github.com/wix-private/wix-base-ui/issues/760 https://github.com/wix-private/wix-base-ui/issues/509
+
+1. [ ] Add set of icons to be exported in the bundle for the consumers to use - https://github.com/wix-private/wix-base-ui/issues/758
+  1. [ ] add a section to storybook to display them - https://github.com/wix-private/wix-base-ui/issues/758
+1. [ ] popover positioning system is not working well, there - https://github.com/wix-private/wix-base-ui/issues/762
+   style/position flashes
+    1. [ ] popover arrow position is also not correct
+
+
+**Handled**:
+1. [x] add support for unidriver
+1. [x] some users don't use react-templates
+1. [x] Add Visual tests infra
+1. [x] Add atomic components API in storybook
+1. [x] Find a solution to display components that exist both in normal and responsive skin with some kind of a toggle.
+1. [x] Storybook examples - Zohar's requirements, we need to discuss it:
+   1. [x] To be displayed in white background
+   1. [x] To be displayed in 288px by default
+1. [x] add component generator
+   1. [x] one for atomic components
+   1. [x] one for composite components
+1. [x] add support for jsx https://github.com/wix-private/wix-base-ui/issues/265","dev,Docs",base-ui,Task,moshek
+Add ellipsis to overflowing PanelHeader content,"Example:
+
+![image](https://user-images.githubusercontent.com/5106211/69937544-c1d03180-14e3-11ea-9069-509155440d03.png)
+
+","dev,Bug,PanelHeader",base-ui,Task,moshek
+Add ellipsis to overflowing Dropdown options,"Several examples: 
+![image](https://user-images.githubusercontent.com/5106211/69937162-9b5dc680-14e2-11ea-9864-65b16edb9db8.png)
+
+![image](https://user-images.githubusercontent.com/5106211/69937194-b9c3c200-14e2-11ea-8ec4-8db09889e253.png)
+
+","dev,Bug,Dropdown",base-ui,Task,moshek
+`TextInput` doesn't work with async `onChange`,"`TextInput` doesn't handle `composing` input events (e.g., typing with Japanese keyboard layout) when `onChange` handler changes value asynchronously (e.g., handler is debounced or relies on WebWorker)
+
+## Bug Impact
+Users can't type their native text into some editor inputs:
+![Screen Recording 2019-11-04 at 17 31 40 2019-11-05 13_43_33](https://user-images.githubusercontent.com/711514/68205182-4d809c00-ffd2-11e9-9a8e-751656231a23.gif)
+![Screen Recording 2019-11-04 at 17 33 10 2019-11-05 13_43_04](https://user-images.githubusercontent.com/711514/68205194-53767d00-ffd2-11e9-80fc-27a40a70762c.gif)
+
+## Minimal reproducible failure
+Wrap `onChange` handler in [`input` BaseUILibrary Playground](http://wix-base-ui.surge.sh/input) in `setTimeout`:
+
+```jsx
+class Wrapper extends React.Component {
+  constructor() {
+    super()
+    this.state = {
+        inputValue: ''
+    }
+    this.onInputValueChange = inputValue =>
+      this.setState({inputValue})
+  }
+
+  render() {
+    const {TextInput, TextLabel} = WixBaseUI
+    const {TextInputLabeled: Composite} = WixBaseUI.Composites
+
+    return (
+      <Composite>
+        <TextLabel value=""Label here""/>
+        <TextInput value={this.state.inputValue}
+          placeholder=""Enter value""
+          onChange={v => setTimeout(this.onInputValueChange, 1, v)} /* ⬅️ */ />
+
+      </Composite>
+    )
+  }
+}
+```","dev,Bug,TextInput",base-ui,Task,moshek
+TooltipOnEllipsis is not enabled for DropDown if options are passed as prop,"TooltipOnEllipsis is working only in the first example. It should work for both ways of providing options to the DropDown component.
+
+```
+<DropDown
+      value={selectedFieldName}
+      onChange={onChange}
+>
+    <DropDownOption value={1} label=""Really loooooooooong label"" disabled={false} />
+</DropDown>
+```
+
+```
+<DropDown
+      value={selectedFieldName}
+      options={ [{ value: 1, label: 'Really loooooooooong label', disabled: false }] }
+      onChange={onChange}
+>
+</DropDown>
+```
+
+![Screenshot from 2019-10-02 15-31-22-x](https://user-images.githubusercontent.com/54025029/66044275-d7e46480-e529-11e9-9703-cc718e7b6858.png)","dev,TooltipOnEllipsis,enhancement",base-ui,Task,moshek
+Dropdown sticky footer is covered by scroll arrows,"The scroll arrows should appear inside the scrollable area.
+
+![Screenshot from 2019-09-25 16-07-40-x](https://user-images.githubusercontent.com/54025029/65603807-00f77900-dfaf-11e9-98da-e4b1408d8b8b.png)","dev,Bug,Dropdown",base-ui,Task,moshek
+Tooltip does not look good near the edge of the viewport,"As you can see in the screenshot below, the arrow overflows out of the bubble
+![image](https://user-images.githubusercontent.com/5106211/65503315-5a877700-decd-11e9-8698-87bfe64b6ae8.png)
+","dev,Bug,Tooltip",base-ui,Task,moshek
